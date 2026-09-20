@@ -1,0 +1,15 @@
+{
+  "standard": "WCAG 2.2 Level AA",
+  "method": "In-house review",
+  "assessedAt": "2026-08-01",
+  "conformance": "fully_conformant",
+  "passed": true,
+  "barriers": [
+    {
+      "id": "video-captions",
+      "summary": "Homepage video has no captions",
+      "reason": "The embedded video was published without captions.",
+      "alternative": "A transcript is available on request."
+    }
+  ]
+}
