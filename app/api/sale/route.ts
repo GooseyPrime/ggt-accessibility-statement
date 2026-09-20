@@ -1,17 +1,20 @@
+import { resolveReport } from "@/lib/inspect-site";
 import { normalizeAppReturnUrl, startSale } from "@/lib/payments";
+import { hasUsableReport, parseReportInput } from "@/lib/report";
 import { NextResponse } from "next/server";
 
 export const runtime = "nodejs";
 
 export async function POST(request: Request) {
-  let body: { url?: unknown; withReport?: unknown; returnUrl?: unknown };
+  let body: { url?: unknown; reportText?: unknown; returnUrl?: unknown };
   try {
-    body = (await request.json()) as { url?: unknown; withReport?: unknown; returnUrl?: unknown };
+    body = (await request.json()) as { url?: unknown; reportText?: unknown; returnUrl?: unknown };
   } catch {
     return NextResponse.json({ ok: false, message: "Send a JSON body." }, { status: 400 });
   }
 
   const url = typeof body.url === "string" ? body.url : "";
+  const reportText = typeof body.reportText === "string" ? body.reportText : "";
   const returnUrl = typeof body.returnUrl === "string" ? body.returnUrl : "";
   if (!url.trim()) {
     return NextResponse.json({ ok: false, message: "Enter a website address." }, { status: 400 });
@@ -28,9 +31,11 @@ export async function POST(request: Request) {
     );
   }
 
+  const resolvedReport = await resolveReport(parseReportInput(reportText));
+
   const result = await startSale({
     url,
-    withReport: body.withReport === true,
+    withReport: hasUsableReport(resolvedReport),
     returnUrl: normalizedReturnUrl,
   });
 

@@ -13,6 +13,10 @@ export function emptyReport(): AccessibilityReport {
   return { ...EMPTY, barriers: [] };
 }
 
+export function hasUsableReport(report: AccessibilityReport): boolean {
+  return report.present && (report.source === "json" || report.source === "url");
+}
+
 export function parseReportInput(raw: string | undefined | null): AccessibilityReport {
   const text = raw?.trim() ?? "";
   if (!text) return emptyReport();

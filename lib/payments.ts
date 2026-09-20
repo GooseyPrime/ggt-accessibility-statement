@@ -1,3 +1,4 @@
+import { normalizeUrl } from "./normalize-url";
 import { PRODUCT_ID, publicBasePath, shopOrigin, TOOL_ID, TOOL_PATH } from "./config";
 
 export type SaleRequest = {
@@ -22,6 +23,11 @@ const LOCAL_SESSION = "local";
 
 export function shopSaleUrl(origin: string): string {
   return `${origin}/api/sale`;
+}
+
+export function canKeepPaidUnlock(nextUrl: string, paidUrl: string | null): boolean {
+  if (!paidUrl) return false;
+  return normalizeUrl(nextUrl).href === paidUrl;
 }
 
 export function normalizeAppReturnUrl(returnUrl: string, requestUrl: string): string | null {

@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 import {
+  canKeepPaidUnlock,
   normalizeAppReturnUrl,
   salePayload,
   shopSaleUrl,
@@ -45,5 +46,11 @@ describe("shop payment handshake", () => {
     );
     expect(normalizeAppReturnUrl("https://tool.example/elsewhere", "https://tool.example/api/sale")).toBeNull();
     expect(normalizeAppReturnUrl("https://attacker.example/elsewhere", "https://tool.example/api/sale")).toBeNull();
+  });
+
+  it("keeps the paid unlock only for the purchased site", () => {
+    expect(canKeepPaidUnlock("riverandoak.example", "https://riverandoak.example/")).toBe(true);
+    expect(canKeepPaidUnlock("https://riverandoak.example/about", "https://riverandoak.example/")).toBe(false);
+    expect(canKeepPaidUnlock("riverandoak.example", null)).toBe(false);
   });
 });

@@ -7,9 +7,11 @@ import {
   publicBasePath,
   shopOrigin,
 } from "@/lib/config";
+import { canKeepPaidUnlock } from "@/lib/payments";
 import { selectedPrice, shopPrices } from "@/lib/prices";
+import { normalizeUrl } from "@/lib/normalize-url";
 import { scoreReadiness } from "@/lib/readiness";
-import { emptyReport } from "@/lib/report";
+import { emptyReport, hasUsableReport } from "@/lib/report";
 import { loadDraft, saveDraft, type DraftState } from "@/lib/storage";
 import { buildStatement, DISCLAIMER, renderHtml, renderPlainText } from "@/lib/statement";
 import type {
@@ -37,6 +39,7 @@ export function ToolApp() {
   const [facts, setFacts] = useState<SiteFacts | null>(null);
   const [report, setReport] = useState<AccessibilityReport>(emptyReport());
   const [paid, setPaid] = useState(false);
+  const [paidUrl, setPaidUrl] = useState<string | null>(null);
   const [paidNote, setPaidNote] = useState("");
   const [view, setView] = useState<PaidView>("text");
   const [copied, setCopied] = useState("");
@@ -79,7 +82,7 @@ export function ToolApp() {
     });
   }, [facts, report, answers]);
 
-  const withReport = report.present && report.source !== "none";
+  const withReport = hasUsableReport(report);
   const price = selectedPrice(shopPrices(), withReport);
   const shop = shopOrigin();
   const localOk = allowLocalUnlock();
@@ -87,7 +90,10 @@ export function ToolApp() {
   async function runInspect(nextUrl: string, nextReport: string, keepPaid: boolean) {
     setError("");
     setWorking(true);
-    if (!keepPaid) setPaid(false);
+    if (!keepPaid) {
+      setPaid(false);
+      setPaidUrl(null);
+    }
     try {
       const res = await fetch(`${publicBasePath()}/api/inspect`, {
         method: "POST",
@@ -105,6 +111,9 @@ export function ToolApp() {
       }
       setFacts(data.facts);
       setReport(data.report);
+      if (keepPaid) {
+        setPaidUrl(data.facts.normalizedUrl);
+      }
       if (data.report.barriers.length) {
         setAnswers((current) => {
           const plans = { ...(current.limitationPlans ?? {}) };
@@ -125,7 +134,7 @@ export function ToolApp() {
 
   async function onInspect(event: React.FormEvent) {
     event.preventDefault();
-    await runInspect(url, reportText, paid);
+    await runInspect(url, reportText, paid && canKeepPaidUnlock(url, paidUrl));
   }
 
   async function onBuy() {
@@ -144,7 +153,7 @@ export function ToolApp() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           url: facts.normalizedUrl,
-          withReport,
+          reportText,
           returnUrl: returnUrl.toString(),
         }),
       });
@@ -168,6 +177,7 @@ export function ToolApp() {
       if (data.paid) {
         setPaid(true);
         if (draft?.url) {
+          setPaidUrl(normalizeUrl(draft.url).href);
           setUrl(draft.url);
           setReportText(draft.reportText);
           setAnswers(draft.answers ?? {});
@@ -236,7 +246,7 @@ export function ToolApp() {
               id="report-input"
               className="ggt-input"
               rows={5}
-              placeholder="Paste report JSON, a report link, or a report token"
+              placeholder="Paste report JSON or a report link"
               value={reportText}
               onChange={(event) => setReportText(event.target.value)}
             />

@@ -48,7 +48,7 @@ export async function inspectSite(input: {
   facts.normalizeNote = normalized.note;
   facts.fetchedAt = (input.now ?? new Date()).toISOString();
 
-  const hydrated = await hydrateReport(report);
+  const hydrated = await resolveReport(report);
   return { facts, report: hydrated };
 }
 
@@ -84,7 +84,7 @@ async function fetchPage(href: string): Promise<{ html?: string; finalUrl?: stri
   }
 }
 
-async function hydrateReport(report: AccessibilityReport): Promise<AccessibilityReport> {
+export async function resolveReport(report: AccessibilityReport): Promise<AccessibilityReport> {
   if (report.source !== "url" || !report.sourceUrl) return report;
   try {
     const fetched = await fetchTextWithChecks({

@@ -18,7 +18,7 @@ Copy `.env.example` to `.env.local` if you want shop origin, mirrored prices, or
 
 ## What it does
 
-1. Paste a site URL (messy trailing words are stripped) and, optionally, a real accessibility report (JSON, link, or token).
+1. Paste a site URL (messy trailing words are stripped) and, optionally, a real accessibility report (JSON or link).
 2. Free result: score `N/9` plus a checklist of which parts are filled and which still need an answer.
 3. Paid result (after the shop confirms the sale): one page with text, HTML, and print. Known limitations come from the report only. Plan lines (“being fixed by”) are editable. The tool never invents barriers and never upgrades conformance.
 
@@ -50,7 +50,7 @@ Fonts: Fraunces, IBM Plex Sans, IBM Plex Mono via `next/font`, as the kit README
 
 This repository holds **no Stripe secrets**. Money stays in [GoldenGooseTools](https://github.com/GooseyPrime/GoldenGooseTools).
 
-1. After the free score, the paywall POSTs `{SHOP}/api/sale` (falls back to `{SHOP}/api/checkout`) with `toolId` / `product` `a11y-statement`, the site URL, `withReport`, and a return URL.
+1. After the free score, the paywall POSTs `{SHOP}/api/sale` (falls back to `{SHOP}/api/checkout`) with `toolId` / `product` `a11y-statement`, the site URL, any attached report text, and a return URL.
 2. The shop returns a checkout URL. The browser goes there.
 3. On return, this page GET/POSTs `{SHOP}/api/verify` with `session_id`.
 4. If the shop says `paid: true`, the three statement views unlock. The draft stays in `sessionStorage` so a refresh can rebuild it.
