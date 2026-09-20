@@ -34,7 +34,7 @@ export function selectedPrice(
   prices: PriceSet,
   withReport: boolean,
 ): { cents: number; label: string } | null {
-  const cents = withReport ? prices.withReportCents ?? prices.aloneCents : prices.aloneCents;
+  const cents = withReport ? prices.withReportCents : prices.aloneCents;
   if (cents == null) return null;
   return { cents, label: formatUsdFromCents(cents) };
 }

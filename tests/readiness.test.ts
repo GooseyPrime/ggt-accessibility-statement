@@ -84,6 +84,23 @@ describe("readiness score out of 9", () => {
     expect(result.parts.find((p) => p.id === "limitations")?.filled).toBe(true);
   });
 
+  it("counts a barrier-free report loaded from a URL as complete", () => {
+    const facts = extractSiteFacts(cleanHtml, "https://riverandoak.example/", "https://riverandoak.example/");
+    const report = fromUnknown(
+      {
+        conformance: "fully_conformant",
+        passed: true,
+        method: "Manual audit",
+        assessedAt: "2026-09-19",
+        barriers: [],
+      },
+      "url",
+    );
+    const result = score(facts, report);
+    expect(result.conformance).toBe("fully_conformant");
+    expect(result.parts.find((p) => p.id === "limitations")?.filled).toBe(true);
+  });
+
   it("lets buyer answers fill the remaining parts without inventing barriers", () => {
     const facts = extractSiteFacts(noContactHtml, "https://nightmarket.example/", "https://nightmarket.example/");
     const result = score(facts, emptyReport(), {

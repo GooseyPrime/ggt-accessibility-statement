@@ -95,9 +95,9 @@ export function decideConformance(report: AccessibilityReport): ConformanceDecis
   if (status === "fully_conformant") {
     const allowed =
       report.claimedConformance === "fully_conformant" &&
+      report.passed === true &&
       report.barriers.length === 0 &&
-      report.failed !== true &&
-      report.passed !== false;
+      report.failed !== true;
     if (!allowed) {
       status = report.barriers.length > 0 ? "partially_conformant" : "not_assessed";
       evidence.push("Fully conformant was refused: the report does not support that claim.");

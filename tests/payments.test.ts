@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { salePayload, shopSaleUrl, shopVerifyUrl } from "../lib/payments";
+import { normalizeAppReturnUrl, salePayload, shopSaleUrl, shopVerifyUrl } from "../lib/payments";
 import { TOOL_ID } from "../lib/config";
 
 describe("shop payment handshake", () => {
@@ -22,5 +22,18 @@ describe("shop payment handshake", () => {
     expect(shopVerifyUrl("https://www.goldengoosetools.com", "cs_test_1")).toBe(
       "https://www.goldengoosetools.com/api/verify?session_id=cs_test_1",
     );
+  });
+
+  it("only accepts return URLs on this app origin", () => {
+    expect(
+      normalizeAppReturnUrl(
+        "https://tool.example/tools/accessibility-statement?session_id=1#paid",
+        "https://tool.example/api/sale",
+      ),
+    ).toBe("https://tool.example/tools/accessibility-statement?session_id=1");
+    expect(normalizeAppReturnUrl("/tools/accessibility-statement?session_id=1", "https://tool.example/api/sale")).toBe(
+      "https://tool.example/tools/accessibility-statement?session_id=1",
+    );
+    expect(normalizeAppReturnUrl("https://attacker.example/elsewhere", "https://tool.example/api/sale")).toBeNull();
   });
 });

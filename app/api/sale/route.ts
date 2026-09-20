@@ -1,4 +1,4 @@
-import { startSale } from "@/lib/payments";
+import { normalizeAppReturnUrl, startSale } from "@/lib/payments";
 import { NextResponse } from "next/server";
 
 export const runtime = "nodejs";
@@ -20,10 +20,18 @@ export async function POST(request: Request) {
     return NextResponse.json({ ok: false, message: "Missing return URL." }, { status: 400 });
   }
 
+  const normalizedReturnUrl = normalizeAppReturnUrl(returnUrl, request.url);
+  if (!normalizedReturnUrl) {
+    return NextResponse.json(
+      { ok: false, message: "Return URL must stay on this app's origin." },
+      { status: 400 },
+    );
+  }
+
   const result = await startSale({
     url,
     withReport: body.withReport === true,
-    returnUrl,
+    returnUrl: normalizedReturnUrl,
   });
 
   if (!result.ok) {

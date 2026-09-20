@@ -307,14 +307,20 @@ export function ToolApp() {
                 <option value="subset">Only some pages</option>
               </select>
               {answers.scope === "subset" ? (
-                <input
-                  className="ggt-input"
-                  placeholder="Which pages does this cover?"
-                  value={answers.subsetDescription ?? ""}
-                  onChange={(event) =>
-                    setAnswers((current) => ({ ...current, subsetDescription: event.target.value }))
-                  }
-                />
+                <div className="ggt-field">
+                  <label className="ggt-label" htmlFor="subset-description">
+                    Which pages this statement covers
+                  </label>
+                  <input
+                    id="subset-description"
+                    className="ggt-input"
+                    placeholder="Which pages does this cover?"
+                    value={answers.subsetDescription ?? ""}
+                    onChange={(event) =>
+                      setAnswers((current) => ({ ...current, subsetDescription: event.target.value }))
+                    }
+                  />
+                </div>
               ) : null}
 
               <label className="ggt-label" htmlFor="method">
@@ -329,7 +335,11 @@ export function ToolApp() {
                   setAnswers((current) => ({ ...current, assessmentMethod: event.target.value }))
                 }
               />
+              <label className="ggt-label" htmlFor="assessment-date">
+                Assessment date
+              </label>
               <input
+                id="assessment-date"
                 className="ggt-input"
                 placeholder="Assessment date YYYY-MM-DD"
                 value={answers.assessmentDate ?? ""}
@@ -424,7 +434,11 @@ export function ToolApp() {
             {price ? (
               <p className="ggt-price">{price.label}</p>
             ) : (
-              <p>Price is set by the shop. Mirror NEXT_PUBLIC_PRICE_CENTS from shop config.</p>
+              <p>
+                Price is set by the shop. Mirror{" "}
+                {withReport ? "NEXT_PUBLIC_PRICE_WITH_REPORT_CENTS" : "NEXT_PUBLIC_PRICE_CENTS"} from
+                shop config.
+              </p>
             )}
             <p>
               {withReport
@@ -446,12 +460,11 @@ export function ToolApp() {
 
         {paid && statement ? (
           <section className="ggt-result">
-            <div className="ggt-tabs ggt-no-print" role="tablist" aria-label="Statement formats">
+            <div className="ggt-tabs ggt-no-print" aria-label="Statement formats">
               <button
                 type="button"
                 className="ggt-tab"
-                role="tab"
-                aria-selected={view === "text"}
+                aria-pressed={view === "text"}
                 onClick={() => setView("text")}
               >
                 Plain text
@@ -459,8 +472,7 @@ export function ToolApp() {
               <button
                 type="button"
                 className="ggt-tab"
-                role="tab"
-                aria-selected={view === "html"}
+                aria-pressed={view === "html"}
                 onClick={() => setView("html")}
               >
                 HTML
@@ -468,8 +480,7 @@ export function ToolApp() {
               <button
                 type="button"
                 className="ggt-tab"
-                role="tab"
-                aria-selected={view === "print"}
+                aria-pressed={view === "print"}
                 onClick={() => setView("print")}
               >
                 Print view

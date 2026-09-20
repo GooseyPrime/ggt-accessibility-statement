@@ -73,6 +73,11 @@ describe("never upgrade conformance", () => {
     expect(["not_conformant", "partially_conformant"]).toContain(decideConformance(report).status);
   });
 
+  it("requires an explicit pass for a full-conformance claim", () => {
+    const report = fromUnknown({ conformance: "fully_conformant", barriers: [] }, "json");
+    expect(decideConformance(report).status).toBe("not_assessed");
+  });
+
   it("treats an unreadable pasted report as not assessed", () => {
     const report = parseReportInput("this is not json and not a url");
     expect(report.source).toBe("unreadable");

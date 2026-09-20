@@ -162,7 +162,10 @@ function partLimitations(input: ScoreInput): PartResult {
       `${barriers.length} known limitation${barriers.length === 1 ? "" : "s"} taken from the linked report.`,
     );
   }
-  if (input.report.present && input.report.source === "json") {
+  if (
+    input.report.present &&
+    (input.report.source === "json" || input.report.source === "url")
+  ) {
     const decision = decideConformance(input.report);
     if (decision.status === "fully_conformant") {
       return part(

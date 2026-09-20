@@ -24,6 +24,18 @@ export function shopSaleUrl(origin: string): string {
   return `${origin}/api/sale`;
 }
 
+export function normalizeAppReturnUrl(returnUrl: string, requestUrl: string): string | null {
+  try {
+    const appUrl = new URL(requestUrl);
+    const parsed = new URL(returnUrl, appUrl);
+    if (parsed.origin !== appUrl.origin) return null;
+    parsed.hash = "";
+    return parsed.toString();
+  } catch {
+    return null;
+  }
+}
+
 export function shopCheckoutUrl(origin: string): string {
   return `${origin}/api/checkout`;
 }

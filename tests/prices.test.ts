@@ -19,6 +19,13 @@ describe("shop-mirrored prices", () => {
     expect(selectedPrice(prices, true)?.label).toBe("$19.00");
   });
 
+  it("does not fall back to the standalone price for with-report checkout", () => {
+    const prices = shopPrices({
+      NEXT_PUBLIC_PRICE_CENTS: "2900",
+    });
+    expect(selectedPrice(prices, true)).toBeNull();
+  });
+
   it("rejects non-integer or non-positive values", () => {
     expect(readPriceCents("29.00")).toBeNull();
     expect(readPriceCents("-100")).toBeNull();
