@@ -6,7 +6,7 @@ import {
   shopVerifyEndpoint,
   shopVerifyUrl,
 } from "../lib/payments";
-import { TOOL_ID } from "../lib/config";
+import { PRODUCT_ID, TOOL_ID } from "../lib/config";
 
 describe("shop payment handshake", () => {
   it("posts toolId and product for the registry stub", () => {
@@ -16,7 +16,7 @@ describe("shop payment handshake", () => {
       returnUrl: "https://example.test/tools/accessibility-statement?paid=1",
     });
     expect(payload.toolId).toBe(TOOL_ID);
-    expect(payload.product).toBe("a11y-statement");
+    expect(payload.product).toBe(PRODUCT_ID);
     expect(payload.withReport).toBe(true);
     expect(payload.url).toBe("https://riverandoak.example/");
   });

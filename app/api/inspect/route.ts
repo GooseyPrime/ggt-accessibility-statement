@@ -1,6 +1,4 @@
-import { defaultStandard, standardChecked } from "@/lib/config";
 import { inspectSite } from "@/lib/inspect-site";
-import { scoreReadiness } from "@/lib/readiness";
 import { NextResponse } from "next/server";
 
 export const runtime = "nodejs";
@@ -20,17 +18,9 @@ export async function POST(request: Request) {
   }
 
   const inspected = await inspectSite({ url, reportText });
-  const readiness = scoreReadiness({
-    facts: inspected.facts,
-    report: inspected.report,
-    defaultStandard: defaultStandard(),
-    standardChecked: standardChecked(),
-  });
-
   return NextResponse.json({
     ok: true,
     facts: inspected.facts,
     report: inspected.report,
-    readiness,
   });
 }

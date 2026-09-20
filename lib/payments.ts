@@ -1,4 +1,4 @@
-import { publicBasePath, shopOrigin, TOOL_ID, TOOL_PATH } from "./config";
+import { PRODUCT_ID, publicBasePath, shopOrigin, TOOL_ID, TOOL_PATH } from "./config";
 
 export type SaleRequest = {
   url: string;
@@ -55,7 +55,7 @@ export function salePayload(input: SaleRequest) {
   return {
     url: input.url,
     toolId: TOOL_ID,
-    product: TOOL_ID,
+    product: PRODUCT_ID,
     withReport: input.withReport,
     success_url: input.returnUrl,
     returnUrl: input.returnUrl,
