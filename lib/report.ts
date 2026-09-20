@@ -141,12 +141,20 @@ function dedupeBarriers(barriers: Barrier[]): Barrier[] {
   const seen = new Set<string>();
   const out: Barrier[] = [];
   for (const barrier of barriers) {
-    const key = `${barrier.id}::${barrier.summary.toLowerCase()}`;
+    const key = dedupeKey(barrier);
     if (seen.has(key)) continue;
     seen.add(key);
     out.push(barrier);
   }
   return out;
+}
+
+function dedupeKey(barrier: Barrier): string {
+  const id = barrier.id.trim().toLowerCase();
+  if (id && !/^barrier-\d+$/.test(id)) {
+    return `id:${id}`;
+  }
+  return `summary:${barrier.summary.trim().toLowerCase().replace(/\s+/g, " ")}`;
 }
 
 function tryParseJson(text: string): unknown | null {

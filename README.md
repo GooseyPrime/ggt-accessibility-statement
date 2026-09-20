@@ -41,7 +41,7 @@ The page says this is general information, not legal advice.
 Chrome comes only from [`ggt-design-kit`](https://github.com/GooseyPrime/ggt-design-kit):
 
 ```json
-"ggt-design-kit": "github:GooseyPrime/ggt-design-kit"
+"ggt-design-kit": "git+https://github.com/GooseyPrime/ggt-design-kit.git#1bacfb219f8be9d4bbe152775686cfe2366cc97e"
 ```
 
 Fonts: Fraunces, IBM Plex Sans, IBM Plex Mono via `next/font`, as the kit README shows. `--ggt-accent: #8a9bb0`. No Tailwind. No other UI library.

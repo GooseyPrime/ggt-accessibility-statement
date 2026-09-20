@@ -82,6 +82,7 @@ export function isBlockedHost(host: string): boolean {
   if (host.endsWith(".localhost")) return true;
   if (host.endsWith(".local")) return true;
   if (isPrivateIpv4(host)) return true;
+  if (isPrivateIpv6(host)) return true;
   return false;
 }
 
@@ -97,6 +98,14 @@ function isPrivateIpv4(host: string): boolean {
   if (a === 192 && b === 168) return true;
   if (a === 172 && b !== undefined && b >= 16 && b <= 31) return true;
   return false;
+}
+
+function isPrivateIpv6(host: string): boolean {
+  const normalized = host.replace(/^\[|\]$/g, "").toLowerCase();
+  if (!normalized.includes(":")) return false;
+  if (normalized === "::" || normalized === "::1") return true;
+  if (normalized.startsWith("::ffff:")) return true;
+  return /^f[c-d][0-9a-f]{0,2}:/i.test(normalized) || /^fe[89ab][0-9a-f]{0,2}:/i.test(normalized);
 }
 
 export function resolveHref(base: string, href: string): string | null {

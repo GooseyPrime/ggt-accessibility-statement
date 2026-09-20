@@ -37,6 +37,9 @@ describe("normalizeUrl", () => {
     expect(normalizeUrl("this").error).toMatch(/website address/i);
     expect(isBlockedHost("127.0.0.1")).toBe(true);
     expect(isBlockedHost("192.168.1.8")).toBe(true);
+    expect(isBlockedHost("[fd00::1]")).toBe(true);
+    expect(isBlockedHost("[fe80::1]")).toBe(true);
+    expect(isBlockedHost("[2001:4860::1]")).toBe(false);
     expect(isBlockedHost("riverandoak.example")).toBe(false);
   });
 });
