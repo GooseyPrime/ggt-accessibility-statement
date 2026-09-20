@@ -1,7 +1,7 @@
 import { parseLooseDate } from "./dates";
 import { parseConformanceClaim } from "./conformance";
 import { normalizeUrl } from "./normalize-url";
-import type { AccessibilityReport, Barrier, ConformanceStatus } from "./types";
+import type { AccessibilityReport, Barrier } from "./types";
 
 const EMPTY: AccessibilityReport = {
   present: false,
@@ -220,12 +220,4 @@ export function applyBuyerPlans(
     ...barrier,
     plan: plans[barrier.id] ?? barrier.plan,
   }));
-}
-
-export function mergeReportClaim(
-  report: AccessibilityReport,
-  forced?: ConformanceStatus,
-): AccessibilityReport {
-  if (!forced) return report;
-  return { ...report, claimedConformance: forced };
 }

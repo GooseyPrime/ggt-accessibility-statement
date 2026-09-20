@@ -1,4 +1,4 @@
-import { shopOrigin, TOOL_ID } from "./config";
+import { publicBasePath, shopOrigin, TOOL_ID, TOOL_PATH } from "./config";
 
 export type SaleRequest = {
   url: string;
@@ -29,6 +29,7 @@ export function normalizeAppReturnUrl(returnUrl: string, requestUrl: string): st
     const appUrl = new URL(requestUrl);
     const parsed = new URL(returnUrl, appUrl);
     if (parsed.origin !== appUrl.origin) return null;
+    if (!allowedReturnPaths().has(stripTrailingSlash(parsed.pathname) || "/")) return null;
     parsed.hash = "";
     return parsed.toString();
   } catch {
@@ -188,4 +189,19 @@ async function readJson(res: Response): Promise<unknown> {
 
 function asString(value: unknown): string | undefined {
   return typeof value === "string" && value.trim() ? value : undefined;
+}
+
+function allowedReturnPaths(): Set<string> {
+  const basePath = stripTrailingSlash(publicBasePath());
+  const paths = new Set<string>(["/", TOOL_PATH]);
+  if (basePath) {
+    paths.add(basePath);
+    paths.add(`${basePath}${TOOL_PATH}`);
+  }
+  return paths;
+}
+
+function stripTrailingSlash(path: string): string {
+  if (path === "/") return "/";
+  return path.replace(/\/+$/, "");
 }

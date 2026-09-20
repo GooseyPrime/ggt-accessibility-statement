@@ -121,7 +121,7 @@ body {
   text-transform: uppercase;
 }
 
-.ggt-tab[aria-selected="true"] {
+.ggt-tab[aria-pressed="true"] {
   border-color: var(--ggt-accent);
 }
 

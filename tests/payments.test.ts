@@ -34,6 +34,7 @@ describe("shop payment handshake", () => {
     expect(normalizeAppReturnUrl("/tools/accessibility-statement?session_id=1", "https://tool.example/api/sale")).toBe(
       "https://tool.example/tools/accessibility-statement?session_id=1",
     );
+    expect(normalizeAppReturnUrl("https://tool.example/elsewhere", "https://tool.example/api/sale")).toBeNull();
     expect(normalizeAppReturnUrl("https://attacker.example/elsewhere", "https://tool.example/api/sale")).toBeNull();
   });
 });
