@@ -1,5 +1,11 @@
 import { describe, expect, it } from "vitest";
-import { normalizeAppReturnUrl, salePayload, shopSaleUrl, shopVerifyUrl } from "../lib/payments";
+import {
+  normalizeAppReturnUrl,
+  salePayload,
+  shopSaleUrl,
+  shopVerifyEndpoint,
+  shopVerifyUrl,
+} from "../lib/payments";
 import { TOOL_ID } from "../lib/config";
 
 describe("shop payment handshake", () => {
@@ -18,6 +24,9 @@ describe("shop payment handshake", () => {
   it("targets shop sale and verify paths", () => {
     expect(shopSaleUrl("https://www.goldengoosetools.com")).toBe(
       "https://www.goldengoosetools.com/api/sale",
+    );
+    expect(shopVerifyEndpoint("https://www.goldengoosetools.com")).toBe(
+      "https://www.goldengoosetools.com/api/verify",
     );
     expect(shopVerifyUrl("https://www.goldengoosetools.com", "cs_test_1")).toBe(
       "https://www.goldengoosetools.com/api/verify?session_id=cs_test_1",

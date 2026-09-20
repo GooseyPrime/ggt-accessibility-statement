@@ -104,8 +104,23 @@ function isPrivateIpv6(host: string): boolean {
   const normalized = host.replace(/^\[|\]$/g, "").toLowerCase();
   if (!normalized.includes(":")) return false;
   if (normalized === "::" || normalized === "::1") return true;
-  if (normalized.startsWith("::ffff:")) return true;
+  if (normalized.startsWith("::ffff:")) {
+    const mapped = mappedIpv4FromIpv6(normalized.slice("::ffff:".length));
+    return mapped ? isPrivateIpv4(mapped) : false;
+  }
   return /^f[c-d][0-9a-f]{0,2}:/i.test(normalized) || /^fe[89ab][0-9a-f]{0,2}:/i.test(normalized);
+}
+
+function mappedIpv4FromIpv6(value: string): string | null {
+  if (value.includes(".")) {
+    return value;
+  }
+  const parts = value.split(":");
+  if (parts.length !== 2 || parts.some((part) => !/^[0-9a-f]{1,4}$/i.test(part))) {
+    return null;
+  }
+  const [left, right] = parts.map((part) => Number.parseInt(part, 16));
+  return [left >> 8, left & 255, right >> 8, right & 255].join(".");
 }
 
 export function resolveHref(base: string, href: string): string | null {

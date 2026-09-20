@@ -39,6 +39,8 @@ describe("normalizeUrl", () => {
     expect(isBlockedHost("192.168.1.8")).toBe(true);
     expect(isBlockedHost("[fd00::1]")).toBe(true);
     expect(isBlockedHost("[fe80::1]")).toBe(true);
+    expect(isBlockedHost("[::ffff:127.0.0.1]")).toBe(true);
+    expect(isBlockedHost("[::ffff:8.8.8.8]")).toBe(false);
     expect(isBlockedHost("[2001:4860::1]")).toBe(false);
     expect(isBlockedHost("riverandoak.example")).toBe(false);
   });

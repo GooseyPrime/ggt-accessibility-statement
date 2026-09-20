@@ -41,8 +41,12 @@ export function shopCheckoutUrl(origin: string): string {
   return `${origin}/api/checkout`;
 }
 
+export function shopVerifyEndpoint(origin: string): string {
+  return `${origin}/api/verify`;
+}
+
 export function shopVerifyUrl(origin: string, sessionId: string): string {
-  const target = new URL(`${origin}/api/verify`);
+  const target = new URL(shopVerifyEndpoint(origin));
   target.searchParams.set("session_id", sessionId);
   return target.toString();
 }
@@ -108,7 +112,7 @@ export async function verifySale(sessionId: string): Promise<VerifyResult> {
     return normalizeVerify(getBody, sessionId);
   }
 
-  const postRes = await fetch(`${origin}/api/verify`, {
+  const postRes = await fetch(shopVerifyEndpoint(origin), {
     method: "POST",
     headers: { "Content-Type": "application/json", Accept: "application/json" },
     body: JSON.stringify({ session_id: sessionId, sessionId }),

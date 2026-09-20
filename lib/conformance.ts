@@ -105,7 +105,7 @@ export function decideConformance(report: AccessibilityReport): ConformanceDecis
   }
 
   if (status === "not_assessed" && (failed || report.barriers.length > 0)) {
-    status = failed && report.barriers.length === 0 ? "not_conformant" : "partially_conformant";
+    status = failed ? "not_conformant" : "partially_conformant";
   }
 
   const reason = reasonFor(status, report);

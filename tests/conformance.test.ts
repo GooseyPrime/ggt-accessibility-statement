@@ -39,6 +39,18 @@ describe("never upgrade conformance", () => {
     expect(decideConformance(report).status).toBe("not_conformant");
   });
 
+  it("keeps an explicit failure as not conformant even when barriers are listed", () => {
+    const report = fromUnknown(
+      {
+        conformance: "fully_conformant",
+        failed: true,
+        barriers: [{ id: "b-1", summary: "Keyboard trap" }],
+      },
+      "json",
+    );
+    expect(decideConformance(report).status).toBe("not_conformant");
+  });
+
   it("refuses to honour a full-conformance claim when barriers are listed", () => {
     const report = fromUnknown(upgraded, "json");
     expect(report.claimedConformance).toBe("fully_conformant");

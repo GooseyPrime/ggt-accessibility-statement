@@ -137,6 +137,7 @@ export function ToolApp() {
     try {
       const returnUrl = new URL(window.location.href);
       returnUrl.searchParams.delete("session_id");
+      returnUrl.searchParams.delete("sessionId");
       const res = await fetch(`${publicBasePath()}/api/sale`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
