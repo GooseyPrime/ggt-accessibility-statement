@@ -10,7 +10,7 @@ import {
 import { selectedPrice, shopPrices } from "@/lib/prices";
 import { scoreReadiness } from "@/lib/readiness";
 import { emptyReport } from "@/lib/report";
-import { loadDraft, saveDraft } from "@/lib/storage";
+import { loadDraft, saveDraft, type DraftState } from "@/lib/storage";
 import { buildStatement, DISCLAIMER, renderHtml, renderPlainText } from "@/lib/statement";
 import type {
   AccessibilityReport,
@@ -39,6 +39,7 @@ export function ToolApp() {
   const [paidNote, setPaidNote] = useState("");
   const [view, setView] = useState<PaidView>("text");
   const [copied, setCopied] = useState("");
+  const [hydrated, setHydrated] = useState(false);
 
   useEffect(() => {
     urlRef.current?.focus();
@@ -48,23 +49,23 @@ export function ToolApp() {
       setReportText(draft.reportText);
       setAnswers(draft.answers ?? {});
     }
+    setHydrated(true);
+    const params = new URLSearchParams(window.location.search);
+    const sessionId = params.get("session_id") ?? params.get("sessionId");
+    if (sessionId) {
+      void confirmSale(sessionId, draft);
+    }
   }, []);
 
   useEffect(() => {
+    if (!hydrated) return;
     saveDraft({
       url,
       reportText,
       answers,
       savedAt: new Date().toISOString(),
     });
-  }, [url, reportText, answers]);
-
-  useEffect(() => {
-    const params = new URLSearchParams(window.location.search);
-    const sessionId = params.get("session_id") ?? params.get("sessionId");
-    if (!sessionId) return;
-    void confirmSale(sessionId);
-  }, []);
+  }, [hydrated, url, reportText, answers]);
 
   const readiness: ReadinessResult | null = useMemo(() => {
     if (!facts) return null;
@@ -82,16 +83,15 @@ export function ToolApp() {
   const shop = shopOrigin();
   const localOk = allowLocalUnlock();
 
-  async function onInspect(event: React.FormEvent) {
-    event.preventDefault();
+  async function runInspect(nextUrl: string, nextReport: string, keepPaid: boolean) {
     setError("");
     setWorking(true);
-    setPaid(false);
+    if (!keepPaid) setPaid(false);
     try {
       const res = await fetch(`${publicBasePath()}/api/inspect`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ url, reportText }),
+        body: JSON.stringify({ url: nextUrl, reportText: nextReport }),
       });
       const data = (await res.json()) as {
         ok?: boolean;
@@ -113,11 +113,18 @@ export function ToolApp() {
           return { ...current, limitationPlans: plans };
         });
       }
+      return true;
     } catch (err) {
       setError(err instanceof Error ? err.message : "Check failed. Confirm the address and try again.");
+      return false;
     } finally {
       setWorking(false);
     }
+  }
+
+  async function onInspect(event: React.FormEvent) {
+    event.preventDefault();
+    await runInspect(url, reportText, paid);
   }
 
   async function onBuy() {
@@ -150,7 +157,7 @@ export function ToolApp() {
     }
   }
 
-  async function confirmSale(sessionId: string) {
+  async function confirmSale(sessionId: string, draft: DraftState | null) {
     try {
       const res = await fetch(
         `${publicBasePath()}/api/verify?session_id=${encodeURIComponent(sessionId)}`,
@@ -158,22 +165,21 @@ export function ToolApp() {
       const data = (await res.json()) as { paid?: boolean; message?: string };
       if (data.paid) {
         setPaid(true);
-        setPaidNote("Payment confirmed by the shop desk. The finished statement is below.");
-        if (!facts) {
-          const draft = loadDraft();
-          if (draft?.url) {
-            setUrl(draft.url);
-            setReportText(draft.reportText);
-            setAnswers(draft.answers ?? {});
-            setPaidNote(
-              "Payment confirmed. The address you typed is still in this browser; run the score again if the statement is not showing.",
-            );
-          } else {
-            setPaidNote(
-              "Payment confirmed. Paste the website address again and run the score to rebuild the statement. Nothing was stored on a server.",
-            );
-          }
+        if (draft?.url) {
+          setUrl(draft.url);
+          setReportText(draft.reportText);
+          setAnswers(draft.answers ?? {});
+          const rebuilt = await runInspect(draft.url, draft.reportText, true);
+          setPaidNote(
+            rebuilt
+              ? "Payment confirmed by the shop desk. The finished statement is below."
+              : "Payment confirmed. The address is still in this browser; run the score again to rebuild the statement.",
+          );
+          return;
         }
+        setPaidNote(
+          "Payment confirmed. Paste the website address again and run the score to rebuild the statement. Nothing was stored on a server.",
+        );
         return;
       }
       setPaidNote(data.message || "The shop has not confirmed this sale yet.");
@@ -246,8 +252,11 @@ export function ToolApp() {
         ) : null}
         {facts?.normalizeNote ? <p className="ggt-note ggt-no-print">{facts.normalizeNote}</p> : null}
         {facts && !facts.fetchOk && facts.fetchError ? (
-          <p className="ggt-note ggt-no-print">
-            {facts.fetchError} The score still uses the address you typed; missing page facts stay blank.
+          <p className="ggt-note ggt-no-print" role="status">
+            {facts.fetchError}
+            {facts.normalizedUrl
+              ? " The score still uses the address you typed; missing page facts stay blank."
+              : ""}
           </p>
         ) : null}
         {paidNote ? <p className="ggt-note ggt-no-print">{paidNote}</p> : null}

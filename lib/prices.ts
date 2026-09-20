@@ -19,10 +19,14 @@ export function formatUsdFromCents(cents: number): string {
   }).format(cents / 100);
 }
 
-export function shopPrices(env: Record<string, string | undefined> = process.env): PriceSet {
+export function shopPrices(env?: Record<string, string | undefined>): PriceSet {
+  const source = env ?? {
+    NEXT_PUBLIC_PRICE_CENTS: process.env.NEXT_PUBLIC_PRICE_CENTS,
+    NEXT_PUBLIC_PRICE_WITH_REPORT_CENTS: process.env.NEXT_PUBLIC_PRICE_WITH_REPORT_CENTS,
+  };
   return {
-    aloneCents: readPriceCents(env.NEXT_PUBLIC_PRICE_CENTS),
-    withReportCents: readPriceCents(env.NEXT_PUBLIC_PRICE_WITH_REPORT_CENTS),
+    aloneCents: readPriceCents(source.NEXT_PUBLIC_PRICE_CENTS),
+    withReportCents: readPriceCents(source.NEXT_PUBLIC_PRICE_WITH_REPORT_CENTS),
   };
 }
 
