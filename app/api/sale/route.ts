@@ -1,0 +1,38 @@
+import { startSale } from "@/lib/payments";
+import { NextResponse } from "next/server";
+
+export const runtime = "nodejs";
+
+export async function POST(request: Request) {
+  let body: { url?: unknown; withReport?: unknown; returnUrl?: unknown };
+  try {
+    body = (await request.json()) as { url?: unknown; withReport?: unknown; returnUrl?: unknown };
+  } catch {
+    return NextResponse.json({ ok: false, message: "Send a JSON body." }, { status: 400 });
+  }
+
+  const url = typeof body.url === "string" ? body.url : "";
+  const returnUrl = typeof body.returnUrl === "string" ? body.returnUrl : "";
+  if (!url.trim()) {
+    return NextResponse.json({ ok: false, message: "Enter a website address." }, { status: 400 });
+  }
+  if (!returnUrl.trim()) {
+    return NextResponse.json({ ok: false, message: "Missing return URL." }, { status: 400 });
+  }
+
+  const result = await startSale({
+    url,
+    withReport: body.withReport === true,
+    returnUrl,
+  });
+
+  if (!result.ok) {
+    return NextResponse.json({ ok: false, message: result.message }, { status: 400 });
+  }
+
+  return NextResponse.json({
+    ok: true,
+    url: result.checkoutUrl,
+    sessionId: result.sessionId,
+  });
+}

@@ -1,0 +1,25 @@
+{
+  "standard": "WCAG 2.2 Level AA",
+  "method": "Golden Goose Tools Accessibility Check",
+  "assessedAt": "2026-09-12",
+  "conformance": "not_conformant",
+  "passed": false,
+  "failed": true,
+  "score": 41,
+  "barriers": [
+    {
+      "id": "img-alt",
+      "summary": "Product photos have no text alternative",
+      "reason": "Decorative and product images are missing alt text.",
+      "alternative": "Call the shop and ask staff to describe the item.",
+      "criterion": "1.1.1"
+    },
+    {
+      "id": "contrast",
+      "summary": "Some text is too faint to read",
+      "reason": "Grey text on a cream background falls below the contrast ratio.",
+      "alternative": "Ask for a high-contrast copy of the page by email.",
+      "criterion": "1.4.3"
+    }
+  ]
+}
