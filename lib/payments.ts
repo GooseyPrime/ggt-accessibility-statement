@@ -30,6 +30,7 @@ export function normalizeAppReturnUrl(returnUrl: string, requestUrl: string): st
     const parsed = new URL(returnUrl, appUrl);
     if (parsed.origin !== appUrl.origin) return null;
     if (!allowedReturnPaths().has(stripTrailingSlash(parsed.pathname) || "/")) return null;
+    parsed.search = "";
     parsed.hash = "";
     return parsed.toString();
   } catch {

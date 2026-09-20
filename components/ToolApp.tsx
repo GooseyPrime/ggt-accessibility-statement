@@ -17,6 +17,7 @@ import type {
   BuyerAnswers,
   ReadinessResult,
   SiteFacts,
+  StatementModel,
 } from "@/lib/types";
 import { useEffect, useMemo, useRef, useState } from "react";
 
@@ -511,7 +512,7 @@ export function ToolApp() {
             ) : null}
 
             {view === "print" ? (
-              <article className="ggt-statement" dangerouslySetInnerHTML={{ __html: html }} />
+              <StatementPrintView statement={statement} />
             ) : null}
 
             {view === "print" ? (
@@ -558,6 +559,49 @@ export function ToolApp() {
       setError("Could not copy. Select the text and copy it yourself.");
     }
   }
+}
+
+function StatementPrintView({ statement }: { statement: StatementModel }) {
+  return (
+    <article className="ggt-statement">
+      <h1>Accessibility statement for {statement.siteLabel}</h1>
+      <h2>About this website</h2>
+      <p>{statement.scopeLine}</p>
+      <h2>Standard aimed at</h2>
+      <p>{statement.standard}</p>
+      <h2>Conformance status</h2>
+      <p>{statement.conformanceSentence}</p>
+      <h2>How this website was assessed</h2>
+      <p>{statement.assessmentLine}</p>
+      <h2>Known limitations</h2>
+      {statement.barriers.length ? (
+        statement.barriers.map((barrier) => (
+          <section key={barrier.id}>
+            <h3>{barrier.summary}</h3>
+            <p>Reason: {barrier.reason || "[add why this barrier exists]"}</p>
+            <p>What you can do instead: {barrier.alternative || "[describe an alternative]"}</p>
+            <p>Being fixed by: {barrier.plan || "[add a date or owner]"}</p>
+            {barrier.criterion ? <p>Related criterion: {barrier.criterion}</p> : null}
+          </section>
+        ))
+      ) : (
+        <p>No measured barriers were supplied with this statement. None have been invented.</p>
+      )}
+      <h2>Reporting a problem</h2>
+      <p>{statement.reportingLine}</p>
+      <h2>Contact</h2>
+      <p>{statement.contactLine}</p>
+      <h2>Requesting content in another format</h2>
+      <p>{statement.alternativeFormatLine}</p>
+      <h2>Date</h2>
+      <p>
+        {statement.dateLine} {statement.lastReviewed}
+      </p>
+      <p>
+        <em>{statement.disclaimer}</em>
+      </p>
+    </article>
+  );
 }
 
 function labelStatus(status: ReadinessResult["conformance"]): string {

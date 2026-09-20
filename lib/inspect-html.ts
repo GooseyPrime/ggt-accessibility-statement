@@ -48,13 +48,25 @@ export function extractSiteFacts(html: string, pageUrl: string, inputUrl: string
     const resolved = resolveHref(pageUrl, href);
     if (!resolved) continue;
 
-    if (!contactUrl && (CONTACT_HREF.test(href) || CONTACT_TEXT.test(text))) {
+    if (
+      !contactUrl &&
+      (CONTACT_HREF.test(href) || CONTACT_TEXT.test(text)) &&
+      hasAllowedScheme(resolved, ["http:", "https:", "mailto:", "tel:"])
+    ) {
       contactUrl = resolved;
     }
-    if (!feedbackUrl && (FEEDBACK_HREF.test(href) || /report a problem/i.test(text))) {
+    if (
+      !feedbackUrl &&
+      (FEEDBACK_HREF.test(href) || /report a problem/i.test(text)) &&
+      hasAllowedScheme(resolved, ["http:", "https:", "mailto:"])
+    ) {
       feedbackUrl = resolved;
     }
-    if (!accessibilityPageUrl && (A11Y_HREF.test(href) || A11Y_TEXT.test(text))) {
+    if (
+      !accessibilityPageUrl &&
+      (A11Y_HREF.test(href) || A11Y_TEXT.test(text)) &&
+      hasAllowedScheme(resolved, ["http:", "https:"])
+    ) {
       accessibilityPageUrl = resolved;
     }
   }
@@ -111,4 +123,12 @@ function tidyName(value: string | undefined): string {
 
 function normalizePhone(value: string): string {
   return value.replace(/\s+/g, " ").trim();
+}
+
+function hasAllowedScheme(value: string, allowed: string[]): boolean {
+  try {
+    return allowed.includes(new URL(value).protocol);
+  } catch {
+    return false;
+  }
 }

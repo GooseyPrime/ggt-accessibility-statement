@@ -39,9 +39,9 @@ describe("shop payment handshake", () => {
         "https://tool.example/tools/accessibility-statement?session_id=1#paid",
         "https://tool.example/api/sale",
       ),
-    ).toBe("https://tool.example/tools/accessibility-statement?session_id=1");
+    ).toBe("https://tool.example/tools/accessibility-statement");
     expect(normalizeAppReturnUrl("/tools/accessibility-statement?session_id=1", "https://tool.example/api/sale")).toBe(
-      "https://tool.example/tools/accessibility-statement?session_id=1",
+      "https://tool.example/tools/accessibility-statement",
     );
     expect(normalizeAppReturnUrl("https://tool.example/elsewhere", "https://tool.example/api/sale")).toBeNull();
     expect(normalizeAppReturnUrl("https://attacker.example/elsewhere", "https://tool.example/api/sale")).toBeNull();
