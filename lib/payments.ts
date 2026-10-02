@@ -1,5 +1,5 @@
 import { normalizeUrl } from "./normalize-url";
-import { PRODUCT_ID, publicBasePath, shopOrigin, TOOL_ID, TOOL_PATH } from "./config";
+import { allowLocalUnlock, PRODUCT_ID, publicBasePath, shopOrigin, TOOL_ID, TOOL_PATH } from "./config";
 
 export type SaleRequest = {
   url: string;
@@ -64,6 +64,8 @@ export function salePayload(input: SaleRequest) {
     toolId: TOOL_ID,
     product: PRODUCT_ID,
     withReport: input.withReport,
+    // The shop desk prices a11y-statement by variant: standard ($29) or renewal ($19).
+    variant: input.withReport ? "renewal" : "standard",
     success_url: input.returnUrl,
     returnUrl: input.returnUrl,
   };
@@ -72,7 +74,7 @@ export function salePayload(input: SaleRequest) {
 export async function startSale(input: SaleRequest): Promise<SaleResult> {
   const origin = shopOrigin();
   if (!origin) {
-    if (process.env.NEXT_PUBLIC_ALLOW_LOCAL_UNLOCK === "true") {
+    if (allowLocalUnlock()) {
       const next = new URL(input.returnUrl);
       next.searchParams.set("session_id", LOCAL_SESSION);
       return { ok: true, checkoutUrl: next.toString(), sessionId: LOCAL_SESSION };
@@ -101,7 +103,7 @@ export async function verifySale(sessionId: string): Promise<VerifyResult> {
 
   const origin = shopOrigin();
   if (!origin) {
-    if (process.env.NEXT_PUBLIC_ALLOW_LOCAL_UNLOCK === "true" && sessionId === LOCAL_SESSION) {
+    if (allowLocalUnlock() && sessionId === LOCAL_SESSION) {
       return { ok: true, paid: true, sessionId, kind: "local_unlock" };
     }
     return {
@@ -178,9 +180,10 @@ function isVerifyShape(value: unknown): value is Record<string, unknown> {
 }
 
 function normalizeVerify(data: Record<string, unknown>, sessionId: string): VerifyResult {
-  const paid = data.paid === true;
+  // The shop confirms any paid session; only a session bought for THIS product may unlock it.
+  const paid = data.paid === true && asString(data.product) === PRODUCT_ID;
   return {
-    ok: data.ok === true || paid,
+    ok: data.ok === true && paid,
     paid,
     kind: asString(data.kind),
     message: asString(data.message),
