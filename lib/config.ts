@@ -32,7 +32,8 @@ export function standardChecked(env: Env = publicEnv()): string {
 }
 
 export function allowLocalUnlock(env: Env = publicEnv()): boolean {
-  return env.NEXT_PUBLIC_ALLOW_LOCAL_UNLOCK === "true";
+  // Development only: never honoured in a production build.
+  return process.env.NODE_ENV !== "production" && env.NEXT_PUBLIC_ALLOW_LOCAL_UNLOCK === "true";
 }
 
 export function nextToolCheck(env: Env = publicEnv()): string {
