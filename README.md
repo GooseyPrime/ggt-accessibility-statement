@@ -2,7 +2,7 @@
 
 Free readiness score across the nine W3C accessibility-statement parts. Paid unlock: the same statement in plain text, HTML with correct headings, and a print view.
 
-Accent: Signal steel `#8a9bb0`. Registry id: `a11y-statement`. Shop path: `/tools/accessibility-statement`.
+Accent: Lapis blue `#5f8bd1`. Registry id: `a11y-statement`. Shop path: `/tools/accessibility-statement`.
 
 **The shop registry `live` flag stays false until Brandon says otherwise.** This app can ship as a draft; it must not appear in the catalogue until a stranger can complete the product-brief acceptance test end to end.
 
@@ -41,10 +41,10 @@ The page says this is general information, not legal advice.
 Chrome comes only from [`ggt-design-kit`](https://github.com/GooseyPrime/ggt-design-kit):
 
 ```json
-"ggt-design-kit": "git+https://github.com/GooseyPrime/ggt-design-kit.git#1bacfb219f8be9d4bbe152775686cfe2366cc97e"
+"ggt-design-kit": "git+https://github.com/GooseyPrime/ggt-design-kit.git#f69b388c00bfa8872a951aa683c51c14f8933ef8"
 ```
 
-Fonts: Fraunces, IBM Plex Sans, IBM Plex Mono via `next/font`, as the kit README shows. `--ggt-accent: #8a9bb0`. No Tailwind. No other UI library.
+The page uses the kit's Lapis theme (`data-ggt-theme="lapis"`) and `--ggt-accent: #5f8bd1`. Fonts: Fraunces, IBM Plex Sans, IBM Plex Mono via `next/font`, as the kit README shows. No Tailwind. No other UI library.
 
 ## Shop payment handshake
 
