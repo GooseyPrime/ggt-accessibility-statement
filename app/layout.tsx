@@ -19,6 +19,7 @@ export const metadata: Metadata = {
   title: "Golden Goose Tools — Accessibility Statement",
   description:
     "Free readiness score across the nine W3C accessibility-statement parts. Unlock a true statement in text, HTML, and print.",
+  icons: { icon: "https://www.goldengoosetools.com/images/GoldenGooseToolsnb.png" },
 };
 
 export default function RootLayout({ children }: { children: ReactNode }) {
