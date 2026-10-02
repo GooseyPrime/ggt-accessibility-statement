@@ -1,9 +1,5 @@
 @import "ggt-design-kit/src/index.css";
 
-:root {
-  --ggt-accent: #8a9bb0;
-}
-
 html,
 body {
   margin: 0;
@@ -73,7 +69,7 @@ body {
 }
 
 .ggt-pill {
-  color: var(--ggt-accent);
+  color: var(--ggt-accent-text, var(--ggt-accent));
   font-family: var(--font-mono), ui-monospace, monospace;
   font-size: 11px;
   letter-spacing: 0.12em;
@@ -122,7 +118,7 @@ body {
 }
 
 .ggt-tab[aria-pressed="true"] {
-  border-color: var(--ggt-accent);
+  border-color: var(--ggt-accent-text, var(--ggt-accent));
 }
 
 .ggt-pre {

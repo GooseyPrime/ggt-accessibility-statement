@@ -1,7 +1,7 @@
 export const TOOL_ID = "a11y-statement";
 export const PRODUCT_ID = "a11y-statement";
 export const TOOL_PATH = "/tools/accessibility-statement";
-export const ACCENT = "#8a9bb0";
+export const ACCENT = "#5f8bd1";
 
 type Env = Record<string, string | undefined>;
 
