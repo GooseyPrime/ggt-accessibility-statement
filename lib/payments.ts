@@ -30,12 +30,25 @@ export function canKeepPaidUnlock(nextUrl: string, paidUrl: string | null): bool
   return normalizeUrl(nextUrl).href === paidUrl;
 }
 
-export function normalizeAppReturnUrl(returnUrl: string, requestUrl: string): string | null {
+/**
+ * Accept a return URL only when it points back at this tool.
+ *
+ * `trustedOrigins` lists other origins this tool is publicly served from. In
+ * production that is the shop, which proxies the tool's path to this deployment:
+ * the buyer's browser is on the shop's origin while `requestUrl` is this app's own.
+ * Without it every checkout started from the public site was refused.
+ */
+export function normalizeAppReturnUrl(
+  returnUrl: string,
+  requestUrl: string,
+  trustedOrigins: readonly string[] = [],
+): string | null {
   try {
     const appUrl = new URL(requestUrl);
     const parsed = new URL(returnUrl, appUrl);
-    if (parsed.origin !== appUrl.origin) return null;
-    if (!allowedReturnPaths().has(stripTrailingSlash(parsed.pathname) || "/")) return null;
+    if (!allowedReturnOrigins(appUrl, trustedOrigins).has(parsed.origin)) return null;
+    const allowedPaths = parsed.origin === appUrl.origin ? allowedReturnPaths() : new Set([TOOL_PATH]);
+    if (!allowedPaths.has(stripTrailingSlash(parsed.pathname) || "/")) return null;
     parsed.search = "";
     parsed.hash = "";
     return parsed.toString();
@@ -203,6 +216,18 @@ async function readJson(res: Response): Promise<unknown> {
 
 function asString(value: unknown): string | undefined {
   return typeof value === "string" && value.trim() ? value : undefined;
+}
+
+function allowedReturnOrigins(appUrl: URL, trustedOrigins: readonly string[]): Set<string> {
+  const origins = new Set<string>([appUrl.origin]);
+  for (const candidate of trustedOrigins) {
+    try {
+      origins.add(new URL(candidate).origin);
+    } catch {
+      // A malformed configured origin is ignored rather than trusted.
+    }
+  }
+  return origins;
 }
 
 function allowedReturnPaths(): Set<string> {
