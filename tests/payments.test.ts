@@ -61,6 +61,12 @@ describe("shop payment handshake", () => {
       ),
     ).toBe("https://shop.example/tools/accessibility-statement");
 
+    // The shop may return only to the path it proxies, not the app's standalone root.
+    expect(normalizeAppReturnUrl("https://shop.example/", proxiedRequest, shop)).toBeNull();
+    expect(normalizeAppReturnUrl("https://tool.example/", proxiedRequest, shop)).toBe(
+      "https://tool.example/",
+    );
+
     // Without the shop listed this is the refusal that blocked every checkout.
     expect(
       normalizeAppReturnUrl("https://shop.example/tools/accessibility-statement", proxiedRequest),

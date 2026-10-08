@@ -47,7 +47,8 @@ export function normalizeAppReturnUrl(
     const appUrl = new URL(requestUrl);
     const parsed = new URL(returnUrl, appUrl);
     if (!allowedReturnOrigins(appUrl, trustedOrigins).has(parsed.origin)) return null;
-    if (!allowedReturnPaths().has(stripTrailingSlash(parsed.pathname) || "/")) return null;
+    const allowedPaths = parsed.origin === appUrl.origin ? allowedReturnPaths() : new Set([TOOL_PATH]);
+    if (!allowedPaths.has(stripTrailingSlash(parsed.pathname) || "/")) return null;
     parsed.search = "";
     parsed.hash = "";
     return parsed.toString();

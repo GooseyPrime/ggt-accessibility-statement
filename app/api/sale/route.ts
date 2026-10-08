@@ -31,7 +31,10 @@ export async function POST(request: Request) {
   const normalizedReturnUrl = normalizeAppReturnUrl(returnUrl, request.url, shop ? [shop] : []);
   if (!normalizedReturnUrl) {
     return NextResponse.json(
-      { ok: false, message: "Return URL must stay on this app's origin." },
+      {
+        ok: false,
+        message: "Return URL must use this app's origin and an allowed path, or the configured shop origin's tool path.",
+      },
       { status: 400 },
     );
   }
