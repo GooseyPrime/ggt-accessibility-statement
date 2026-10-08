@@ -1,4 +1,5 @@
 import { resolveReport } from "@/lib/inspect-site";
+import { shopOrigin } from "@/lib/config";
 import { normalizeAppReturnUrl, startSale } from "@/lib/payments";
 import { hasUsableReport, parseReportInput } from "@/lib/report";
 import { NextResponse } from "next/server";
@@ -23,7 +24,11 @@ export async function POST(request: Request) {
     return NextResponse.json({ ok: false, message: "Missing return URL." }, { status: 400 });
   }
 
-  const normalizedReturnUrl = normalizeAppReturnUrl(returnUrl, request.url);
+  // Buyers reach this app through the shop, which proxies /tools/accessibility-statement
+  // here. The browser's address is then on the shop's origin while request.url is this
+  // deployment's own, so the shop origin has to be accepted alongside it.
+  const shop = shopOrigin();
+  const normalizedReturnUrl = normalizeAppReturnUrl(returnUrl, request.url, shop ? [shop] : []);
   if (!normalizedReturnUrl) {
     return NextResponse.json(
       { ok: false, message: "Return URL must stay on this app's origin." },

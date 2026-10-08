@@ -48,6 +48,36 @@ describe("shop payment handshake", () => {
     expect(normalizeAppReturnUrl("https://attacker.example/elsewhere", "https://tool.example/api/sale")).toBeNull();
   });
 
+  it("accepts the shop origin when the tool is served through the shop proxy", () => {
+    const proxiedRequest = "https://tool.example/tools/accessibility-statement/api/sale";
+    const shop = ["https://shop.example"];
+
+    // What a buyer's browser sends: its own address, which is on the shop.
+    expect(
+      normalizeAppReturnUrl(
+        "https://shop.example/tools/accessibility-statement?canceled=1#top",
+        proxiedRequest,
+        shop,
+      ),
+    ).toBe("https://shop.example/tools/accessibility-statement");
+
+    // Without the shop listed this is the refusal that blocked every checkout.
+    expect(
+      normalizeAppReturnUrl("https://shop.example/tools/accessibility-statement", proxiedRequest),
+    ).toBeNull();
+
+    // The path allow-list still applies on the shop origin.
+    expect(normalizeAppReturnUrl("https://shop.example/elsewhere", proxiedRequest, shop)).toBeNull();
+
+    // Any other origin is still refused, as is a malformed configured origin.
+    expect(
+      normalizeAppReturnUrl("https://attacker.example/tools/accessibility-statement", proxiedRequest, shop),
+    ).toBeNull();
+    expect(
+      normalizeAppReturnUrl("https://shop.example/tools/accessibility-statement", proxiedRequest, ["not a url"]),
+    ).toBeNull();
+  });
+
   it("keeps the paid unlock only for the purchased site", () => {
     expect(canKeepPaidUnlock("riverandoak.example", "https://riverandoak.example/")).toBe(true);
     expect(canKeepPaidUnlock("https://riverandoak.example/about", "https://riverandoak.example/")).toBe(false);
